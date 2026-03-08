@@ -64,7 +64,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const now = new Date();
     fetch(`/api/reports/summary?year=${now.getFullYear()}&month=${now.getMonth() + 1}`)
-      .then((r) => r.json())
+      .then((r) => r.ok ? r.json() : null)
       .then((d) => { setData(d); setLoading(false); })
       .catch(() => setLoading(false));
   }, []);
