@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased;
+  }
+
+  /* Scrollbar styling for the staffing grid horizontal scroll */
+  .grid-scroll::-webkit-scrollbar {
+    height: 6px;
+  }
+  .grid-scroll::-webkit-scrollbar-track {
+    @apply bg-slate-100 rounded;
+  }
+  .grid-scroll::-webkit-scrollbar-thumb {
+    @apply bg-slate-400 rounded;
+  }
+}
+
+@layer components {
+  .input-base {
+    @apply block w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900
+           placeholder-slate-400 shadow-sm
+           focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500
+           disabled:bg-slate-50 disabled:text-slate-500;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-md bg-blue-700 px-4 py-2 text-sm
+           font-medium text-white shadow-sm hover:bg-blue-800 focus:outline-none focus:ring-2
+           focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-60 transition-colors;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-md border border-slate-300 bg-white
+           px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none
+           focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-60 transition-colors;
+  }
+
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-md bg-red-600 px-4 py-2 text-sm
+           font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2
+           focus:ring-red-500 focus:ring-offset-2 disabled:opacity-60 transition-colors;
+  }
+
+  .card {
+    @apply rounded-xl border border-slate-200 bg-white shadow-sm;
+  }
+
+  .table-th {
+    @apply px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500;
+  }
+
+  .table-td {
+    @apply px-4 py-3 text-sm text-slate-700;
+  }
+
+  .table-tr {
+    @apply border-b border-slate-100 hover:bg-slate-50 transition-colors;
+  }
+}

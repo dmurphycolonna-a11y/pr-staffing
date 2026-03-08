@@ -1,0 +1,152 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// UserRole values (stored as String for SQLite compatibility):
+// ADMIN | STAFFING_MANAGER | FINANCE | DEPARTMENT_LEADER | EMPLOYEE_MANAGER
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      String   @default("STAFFING_MANAGER")
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Office {
+  id          String       @id @default(cuid())
+  name        String
+  code        String       @unique
+  departments Department[]
+  employees   Employee[]
+  createdAt   DateTime     @default(now())
+}
+
+model Department {
+  id        String     @id @default(cuid())
+  name      String
+  officeId  String
+  office    Office     @relation(fields: [officeId], references: [id])
+  employees Employee[]
+  createdAt DateTime   @default(now())
+}
+
+model JobTitle {
+  id          String       @id @default(cuid())
+  name        String       @unique
+  level       Int          @default(1) // 1=junior, higher=senior
+  clientRates ClientRate[]
+  employees   Employee[]
+  createdAt   DateTime     @default(now())
+}
+
+model Employee {
+  id           String      @id @default(cuid())
+  name         String
+  email        String      @unique
+  jobTitleId   String
+  jobTitle     JobTitle    @relation(fields: [jobTitleId], references: [id])
+  officeId     String?
+  office       Office?     @relation(fields: [officeId], references: [id])
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id])
+  isActive     Boolean     @default(true)
+  startDate    DateTime?
+  allocations  Allocation[]
+  actuals      Actual[]
+  capacities   Capacity[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model Client {
+  id          String       @id @default(cuid())
+  name        String
+  code        String       @unique
+  industry    String?
+  contactName String?
+  isActive    Boolean      @default(true)
+  clientRates ClientRate[]
+  allocations Allocation[]
+  actuals     Actual[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+// Rate for a specific client + job title combination with effective dates.
+// To find the active rate: MAX(effectiveFrom) where effectiveFrom <= period start.
+model ClientRate {
+  id            String    @id @default(cuid())
+  clientId      String
+  client        Client    @relation(fields: [clientId], references: [id])
+  jobTitleId    String
+  jobTitle      JobTitle  @relation(fields: [jobTitleId], references: [id])
+  hourlyRate    Float
+  effectiveFrom DateTime
+  effectiveTo   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([clientId, jobTitleId, effectiveFrom])
+}
+
+// Monthly capacity per employee. Default 160h if no record exists.
+model Capacity {
+  id         String   @id @default(cuid())
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id])
+  year       Int
+  month      Int      // 1–12
+  totalHours Float    @default(160)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([employeeId, year, month])
+}
+
+// Planned staffing allocation: one record per employee + client + month.
+// plannedRevenue is auto-calculated: plannedHours × resolved ClientRate.
+model Allocation {
+  id             String   @id @default(cuid())
+  employeeId     String
+  employee       Employee @relation(fields: [employeeId], references: [id])
+  clientId       String
+  client         Client   @relation(fields: [clientId], references: [id])
+  year           Int
+  month          Int      // 1–12
+  plannedHours   Float?
+  plannedPct     Float?   // 0–100, derived from plannedHours / capacity
+  plannedRevenue Float?   // plannedHours × hourlyRate
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([employeeId, clientId, year, month])
+}
+
+// Actuals loaded from timesheets or CSV import.
+model Actual {
+  id             String    @id @default(cuid())
+  employeeId     String
+  employee       Employee  @relation(fields: [employeeId], references: [id])
+  clientId       String
+  client         Client    @relation(fields: [clientId], references: [id])
+  year           Int
+  month          Int       // 1–12
+  actualHours    Float?
+  actualRevenue  Float?
+  actualBillings Float?    // invoiced amount, may differ from revenue
+  source         String?   // "manual" | "csv_import"
+  importedAt     DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@unique([employeeId, clientId, year, month])
+}
