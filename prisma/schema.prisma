@@ -41,7 +41,7 @@ model Department {
 model JobTitle {
   id          String       @id @default(cuid())
   name        String       @unique
-  level       Int          @default(1) // 1=junior, higher=senior
+  level       String       // e.g. "WS_ASSOC.2", "WS_MANAGE.1", "CEO"
   clientRates ClientRate[]
   employees   Employee[]
   createdAt   DateTime     @default(now())

@@ -36,16 +36,16 @@ async function main() {
       prisma.department.create({ data: { name: "Consumer & Lifestyle PR", officeId: lax.id } }),
     ]);
 
-  // ── Job Titles (level: higher = more senior) ────────────────────────────
+  // ── Job Titles (level codes: WS_MANAGE.N = senior, WS_ASSOC.N = junior) ──
   const [mdTitle, vpTitle, adTitle, samTitle, amTitle, saeTitle, aeTitle] =
     await Promise.all([
-      prisma.jobTitle.create({ data: { name: "Managing Director", level: 7 } }),
-      prisma.jobTitle.create({ data: { name: "Vice President", level: 6 } }),
-      prisma.jobTitle.create({ data: { name: "Account Director", level: 5 } }),
-      prisma.jobTitle.create({ data: { name: "Senior Account Manager", level: 4 } }),
-      prisma.jobTitle.create({ data: { name: "Account Manager", level: 3 } }),
-      prisma.jobTitle.create({ data: { name: "Senior Account Executive", level: 2 } }),
-      prisma.jobTitle.create({ data: { name: "Account Executive", level: 1 } }),
+      prisma.jobTitle.create({ data: { name: "Managing Director",      level: "WS_MANAGE.1" } }),
+      prisma.jobTitle.create({ data: { name: "Vice President",         level: "WS_MANAGE.2" } }),
+      prisma.jobTitle.create({ data: { name: "Account Director",       level: "WS_MANAGE.3" } }),
+      prisma.jobTitle.create({ data: { name: "Senior Account Manager", level: "WS_ASSOC.1" } }),
+      prisma.jobTitle.create({ data: { name: "Account Manager",        level: "WS_ASSOC.2" } }),
+      prisma.jobTitle.create({ data: { name: "Senior Account Executive", level: "WS_ASSOC.3" } }),
+      prisma.jobTitle.create({ data: { name: "Account Executive",      level: "WS_ASSOC.4" } }),
     ]);
 
   // ── Users (hashed passwords) ─────────────────────────────────────────────
